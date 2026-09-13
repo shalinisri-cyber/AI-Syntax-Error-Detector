@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, request, jsonify
 from error_detector import detect_errors
 from ai_helper import ask_gemini
@@ -52,9 +54,6 @@ def check_code():
         "ai_explanation": ""
     })
 
-
-if __name__ == "__main__":
-    import os
 
 if __name__ == "__main__":
     app.run(
