@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeSense AI | Intelligent Code Assistant</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --page-bg: #f4f7fb;
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --border: #e2e8f0;
+            --text: #172033;
+            --muted: #64748b;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-soft: #eef2ff;
+            --success: #16a34a;
+            --success-soft: #ecfdf5;
+            --danger: #dc2626;
+            --danger-soft: #fef2f2;
+            --shadow: 0 15px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: var(--page-bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        button,
+        textarea {
+            font-family: inherit;
+        }
+
+        .app-container {
+            min-height: 100vh;
+        }
+
+        /* Header */
+
+        .navbar {
+            height: 72px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            font-weight: 800;
+            box-shadow: 0 8px 18px rgba(99, 102, 241, 0.25);
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+        }
+
+        .brand-name span {
+            color: var(--primary);
+        }
+
+        .brand-subtitle {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .header-badge {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 13px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px #dcfce7;
+        }
+
+        /* Main layout */
+
+        .main-content {
+            width: min(1400px, 90%);
+            margin: 0 auto;
+            padding: 46px 0 60px;
+        }
+
+        .hero-section {
+            text-align: center;
+            max-width: 760px;
+            margin: 0 auto 38px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-soft);
+            color: var(--primary-dark);
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .hero-section h1 {
+            font-size: clamp(30px, 4vw, 52px);
+            line-height: 1.12;
+            letter-spacing: -1.8px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-section p {
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        /* Workspace */
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            min-height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .panel-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .panel-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .panel-description {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .language-badge {
+            padding: 7px 11px;
+            border-radius: 8px;
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        /* Editor */
+
+        .editor-wrapper {
+            background: #111827;
+            transition: background 0.25s ease;
+        }
+
+        .editor-wrapper.light-editor {
+            background: #f8fafc;
+        }
+
+        .editor-toolbar {
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: #1f2937;
+            border-bottom: 1px solid #374151;
+        }
+
+        .light-editor .editor-toolbar {
+            background: #e2e8f0;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .window-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-red {
+            background: #f87171;
+        }
+
+        .dot-yellow {
+            background: #facc15;
+        }
+
+        .dot-green {
+            background: #4ade80;
+        }
+
+        .editor-toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .editor-label {
+            color: #9ca3af;
+            font-size: 11px;
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        .light-editor .editor-label {
+            color: #64748b;
+        }
+
+        .editor-theme-button {
+            border: 1px solid #4b5563;
+            background: #374151;
+            color: #e5e7eb;
+            border-radius: 7px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .editor-theme-button:hover {
+            background: #4b5563;
+        }
+
+        .light-editor .editor-theme-button {
+            border-color: #cbd5e1;
+            background: #ffffff;
+            color: #334155;
+        }
+
+        .light-editor .editor-theme-button:hover {
+            background: #f1f5f9;
+        }
+
+        .editor-content {
+            display: flex;
+            min-height: 410px;
+        }
+
+        .line-numbers {
+            width: 52px;
+            flex-shrink: 0;
+            padding: 20px 12px 20px 0;
+            background: #111827;
+            color: #64748b;
+            text-align: right;
+            font: 13px/1.8 "JetBrains Mono", monospace;
+            user-select: none;
+        }
+
+        .light-editor .line-numbers {
+            background: #f1f5f9;
+            color: #94a3b8;
+        }
+
+        #codeInput {
+            width: 100%;
+            min-height: 410px;
+            resize: vertical;
+            border: none;
+            outline: none;
+            padding: 20px;
+            background: #111827;
+            color: #e5e7eb;
+            font: 13px/1.8 "JetBrains Mono", monospace;
+            tab-size: 4;
+        }
+
+        #codeInput::placeholder {
+            color: #6b7280;
+        }
+
+        .light-editor #codeInput {
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        .light-editor #codeInput::placeholder {
+            color: #94a3b8;
+        }
+
+        .editor-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #1f2937;
+            border-top: 1px solid #374151;
+        }
+
+        .light-editor .editor-footer {
+            background: #e2e8f0;
+            border-top: 1px solid #cbd5e1;
+        }
+
+        .editor-info {
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        .light-editor .editor-info {
+            color: #64748b;
+        }
+
+        .clear-button {
+            border: none;
+            background: transparent;
+            color: #9ca3af;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .clear-button:hover {
+            color: #f87171;
+        }
+
+        /* Action area */
+
+        .action-area {
+            padding: 18px 20px 20px;
+            background: var(--surface);
+        }
+
+        .check-button {
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #6366f1, #7c3aed);
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 22px rgba(99, 102, 241, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(99, 102, 241, 0.32);
+        }
+
+        .check-button:active {
+            transform: translateY(0);
+        }
+
+        .check-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+        }
+
+        .button-icon {
+            font-size: 17px;
+        }
+
+        /* Result panel */
+
+        .results-panel {
+            min-height: 570px;
+        }
+
+        .results-content {
+            padding: 20px;
+        }
+
+        .empty-state {
+            min-height: 455px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .empty-icon {
+            width: 78px;
+            height: 78px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 24px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-size: 34px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            max-width: 330px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .result-section {
+            margin-bottom: 20px;
+        }
+
+        .result-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .result-heading .heading-icon {
+            font-size: 16px;
+        }
+
+        .error-box {
+            background: var(--danger-soft);
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 14px;
+            color: #991b1b;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .success-box {
+            background: var(--success-soft);
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 16px;
+            color: #166534;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .ai-box {
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .ai-box h1,
+        .ai-box h2,
+        .ai-box h3 {
+            margin: 14px 0 8px;
+            font-size: 15px;
+        }
+
+        .ai-box strong {
+            color: var(--primary-dark);
+        }
+
+        .ai-box pre {
+            background: #111827;
+            color: #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            margin: 12px 0;
+            overflow-x: auto;
+            font: 12px/1.7 "JetBrains Mono", monospace;
+        }
+
+        .ai-box code {
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 30px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 3px solid #e0e7ff;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Feature cards */
+
+        .features-section {
+            margin-top: 38px;
+        }
+
+        .features-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            transition: 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-card-icon {
+            font-size: 24px;
+            margin-bottom: 14px;
+        }
+
+        .feature-card h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+
+        .footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 11px;
+            padding-top: 42px;
+        }
+
+        .footer strong {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+
+        @media (max-width: 1000px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .results-panel {
+                min-height: auto;
+            }
+
+            .empty-state {
+                min-height: 300px;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .navbar {
+                padding: 0 5%;
+            }
+
+            .brand-subtitle,
+            .header-badge {
+                display: none;
+            }
+
+            .main-content {
+                width: 92%;
+                padding-top: 30px;
+            }
+
+            .hero-section h1 {
+                font-size: 31px;
+            }
+
+            .hero-section p {
+                font-size: 13px;
+            }
+
+            .panel-header {
+                padding: 14px;
+            }
+
+            .results-content,
+            .action-area {
+                padding: 15px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .editor-content,
+            #codeInput {
+                min-height: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- Navigation Bar -->
+        <header class="navbar">
+            <div class="brand">
+                <div class="brand-icon">&lt;/&gt;</div>
+
+                <div>
+                    <div class="brand-name">Code<span>Sense</span> AI</div>
+                    <div class="brand-subtitle">Intelligent Syntax Learning Assistant</div>
+                </div>
+            </div>
+
+            <div class="header-badge">
+                <span class="status-dot"></span>
+                AI Engine Online
+            </div>
+        </header>
+
+        <main class="main-content">
+
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="eyebrow">
+                    ✦ AI-POWERED CODE ANALYSIS
+                </div>
+
+                <h1>
+                    Write Better Code.<br>
+                    <span class="gradient-text">Learn From Every Error.</span>
+                </h1>
+
+                <p>
+                    Detect C syntax errors, understand why they happen,
+                    and receive clear AI-powered corrections designed
+                    for both developers and learners.
+                </p>
+            </section>
+
+            <!-- Main Workspace -->
+            <section class="workspace">
+
+                <!-- Code Editor Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <div class="panel-icon">⌘</div>
+
+                            <div>
+                                <div class="panel-title">Code Editor</div>
+                                <div class="panel-description">
+                                    Write or paste your C program
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="language-badge">C / C99</div>
+                    </div>
+
+                    <div class="editor-wrapper" id="editorWrapper">
+
+                        <div class="editor-toolbar">
+                            <div class="window-dots">
+                                <span class="window-dot dot-red"></span>
+                                <span class="window-dot dot-yellow"></span>
+                                <span class="window-dot dot-green"></span>
+                            </div>
+
+                            <div class="editor-toolbar-right">
+                                <span class="editor-label">main.c</span>
+
+                                <button
+                                    class="editor-theme-button"
+                                    id="editorThemeButton"
+                                    onclick="toggleEditorTheme()">
+                                    ☀ Light Editor
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="editor-content">
+                            <div class="line-numbers" id="lineNumbers">1</div>
+
+                            <textarea
+                                id="codeInput"
+                                spellcheck="false"
+                                placeholder="// Start writing your C code here...
+
+#include <stdio.h>
+
+int main() {
+    printf(&quot;Hello, CodeSense!&quot;);
+    return 0;
+}"></textarea>
+                        </div>
+
+                        <div class="editor-footer">
+                            <span class="editor-info">
+                                C language • Syntax analysis enabled
+                            </span>
+
+                            <button
+                                class="clear-button"
+                                onclick="clearCode()">
+                                Clear editor
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="action-area">
+                        <button
+                            class="check-button"
+                            id="checkButton"
+                            onclick="checkSyntax()">
+                            <span class="button-icon">⚡</span>
+                            <span id="buttonText">Check Syntax + AI Explain</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="panel results-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <div class="panel-icon">✦</div>
+
+                            <div>
+                                <div class="panel-title">Analysis Results</div>
+                                <div class="panel-description">
+                                    Your code insights appear here
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="results-content" id="resultsContent">
+                        <div class="empty-state">
+                            <div class="empty-icon">⌁</div>
+
+                            <h3>Ready to analyze your code</h3>
+
+                            <p>
+                                Enter a C program in the editor and click
+                                <strong>Check Syntax + AI Explain</strong>
+                                to receive error details and learning-friendly
+                                AI feedback.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Features -->
+            <section class="features-section">
+                <h2 class="features-title">Built for Coding and Learning</h2>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-icon">🔍</div>
+                        <h3>Smart Error Detection</h3>
+                        <p>
+                            Identify common syntax problems such as missing
+                            semicolons, brackets, and incorrect code structure.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-card-icon">🧠</div>
+                        <h3>AI-Powered Explanation</h3>
+                        <p>
+                            Understand what went wrong, why it happened,
+                            and how to prevent similar mistakes.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-card-icon">🚀</div>
+                        <h3>Learn Through Practice</h3>
+                        <p>
+                            Improve your programming skills with corrected
+                            examples and simple explanations.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="footer">
+                Built with <strong>Flask</strong>, <strong>Python</strong>,
+                and <strong>Gemini AI</strong> • CodeSense AI
+            </footer>
+
+        </main>
+    </div>
+
+    <script>
+        const codeInput = document.getElementById("codeInput");
+        const lineNumbers = document.getElementById("lineNumbers");
+        const editorWrapper = document.getElementById("editorWrapper");
+        const editorThemeButton = document.getElementById("editorThemeButton");
+        const resultsContent = document.getElementById("resultsContent");
+        const checkButton = document.getElementById("checkButton");
+        const buttonText = document.getElementById("buttonText");
+
+        let isLightEditor = false;
+
+        // Update line numbers
+        function updateLineNumbers() {
+            const lines = codeInput.value.split("\n").length;
+
+            let numbers = "";
+
+            for (let i = 1; i <= lines; i++) {
+                numbers += i + "<br>";
+            }
+
+            lineNumbers.innerHTML = numbers;
+        }
+
+        codeInput.addEventListener("input", updateLineNumbers);
+
+        codeInput.addEventListener("scroll", function () {
+            lineNumbers.scrollTop = codeInput.scrollTop;
+        });
+
+        // Allow Tab key inside the code editor
+        codeInput.addEventListener("keydown", function (event) {
+            if (event.key === "Tab") {
+                event.preventDefault();
+
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+
+                this.value =
+                    this.value.substring(0, start) +
+                    "    " +
+                    this.value.substring(end);
+
+                this.selectionStart = this.selectionEnd = start + 4;
+
+                updateLineNumbers();
+            }
+        });
+
+        // Toggle only the coding editor theme
+        function toggleEditorTheme() {
+            isLightEditor = !isLightEditor;
+
+            if (isLightEditor) {
+                editorWrapper.classList.add("light-editor");
+                editorThemeButton.innerHTML = "🌙 Dark Editor";
+            } else {
+                editorWrapper.classList.remove("light-editor");
+                editorThemeButton.innerHTML = "☀ Light Editor";
+            }
+        }
+
+        // Clear editor
+        function clearCode() {
+            codeInput.value = "";
+            updateLineNumbers();
+
+            resultsContent.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">⌁</div>
+                    <h3>Ready to analyze your code</h3>
+                    <p>
+                        Enter a C program in the editor and click
+                        <strong>Check Syntax + AI Explain</strong>
+                        to receive error details and learning-friendly
+                        AI feedback.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Format AI response for display
+        function formatAIResponse(text) {
+            if (!text) {
+                return "No AI explanation was returned.";
+            }
+
+            let formatted = text
+                .replace(/```c/g, "<pre><code>")
+                .replace(/```cpp/g, "<pre><code>")
+                .replace(/```/g, "</code></pre>")
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+                .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+                .replace(/\n/g, "<br>");
+
+            return formatted;
+        }
+
+        // Check syntax using Flask backend
+        async function checkSyntax() {
+            const code = codeInput.value.trim();
+
+            if (!code) {
+                resultsContent.innerHTML = `
+                    <div class="error-box">
+                        Please enter some C code before checking.
+                    </div>
+                `;
+                return;
+            }
+
+            checkButton.disabled = true;
+            buttonText.innerHTML = "Analyzing your code...";
+
+            resultsContent.innerHTML = `
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <span>Scanning code and asking Gemini AI...</span>
+                </div>
+            `;
+
+            try {
+                const response = await fetch("/check", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        code: code
+                    })
+                });
+
+                const data = await response.json();
+
+                let html = "";
+
+                if (data.errors && data.errors.length > 0) {
+                    html += `
+                        <div class="result-section">
+                            <div class="result-heading">
+                                <span class="heading-icon">⚠️</span>
+                                Syntax Issues Detected
+                            </div>
+
+                            <div class="error-box">
+                    `;
+
+                    data.errors.forEach(error => {
+                        html += `
+                            <strong>Line ${error.line}</strong>
+                            <br>
+                            ${error.type}: ${error.message}
+                            <br><br>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="result-section">
+                            <div class="result-heading">
+                                <span class="heading-icon">✅</span>
+                                Syntax Check
+                            </div>
+
+                            <div class="success-box">
+                                No basic syntax errors detected in your code.
+                                Your code looks structurally correct.
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (data.ai_explanation) {
+                    html += `
+                        <div class="result-section">
+                            <div class="result-heading">
+                                <span class="heading-icon">🧠</span>
+                                Gemini AI Explanation
+                            </div>
+
+                            <div class="ai-box">
+                                ${formatAIResponse(data.ai_explanation)}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                resultsContent.innerHTML = html;
+
+            } catch (error) {
+                resultsContent.innerHTML = `
+                    <div class="error-box">
+                        Unable to connect to the backend.
+                        Please make sure Flask is running in the terminal.
+                    </div>
+                `;
+            } finally {
+                checkButton.disabled = false;
+                buttonText.innerHTML = "Check Syntax + AI Explain";
+            }
+        }
+
+        // Initial line numbers
+        updateLineNumbers();
+    </script>
+</body>
+</html>
